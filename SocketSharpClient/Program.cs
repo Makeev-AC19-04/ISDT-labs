@@ -39,7 +39,6 @@ namespace SocketSharpClient
             {
                 Console.WriteLine("Menu:\n1.Send to all\n2.Send to one\n3. Exit");
                 int menu;
-                //Convert.ToInt32(Console.ReadLine());
                 if (int.TryParse(Console.ReadLine(), out menu))
                 {
                     switch (menu)
@@ -73,7 +72,7 @@ namespace SocketSharpClient
                                 break;
                             }
                     }
-                };
+                }
             }
         }
     }

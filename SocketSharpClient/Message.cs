@@ -132,13 +132,21 @@ namespace SocketSharpClient
 				throw new Exception("Connection error");
 			}
 			var m = new Message(to, clientID, type, data);
-			m.send(s);
-			if (m.receive(s) == MessageTypes.MT_INIT)
+			if (m.header.to == m.header.from)
 			{
-				clientID = m.header.to;
-				Console.WriteLine("clientID is " + clientID + "\n");
+				Console.WriteLine("You can't write message to yourself");
+				return m;
 			}
-			return m;
+			else
+			{
+				m.send(s);
+				if (m.receive(s) == MessageTypes.MT_INIT)
+				{
+					clientID = m.header.to;
+					Console.WriteLine("clientID is " + clientID + "\n");
+				}
+				return m;
+			}
 		}
 	}
 }
