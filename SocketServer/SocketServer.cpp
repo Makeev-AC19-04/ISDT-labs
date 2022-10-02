@@ -11,11 +11,20 @@
 #define new DEBUG_NEW
 #endif
 
-void LaunchClient()
+void LaunchCppClient()
 {
 	STARTUPINFO si = { sizeof(si) };
 	PROCESS_INFORMATION pi;
 	CreateProcess(NULL, (LPSTR)"SocketClient.exe", NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+}
+
+void LaunchSharpClient()
+{
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	CreateProcess(NULL, (LPSTR)"net6.0/SocketSharpClient.exe", NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
 	CloseHandle(pi.hThread);
 	CloseHandle(pi.hProcess);
 }
@@ -115,9 +124,10 @@ void Server()
 	CSocket Server;
 	Server.Create(12435);
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 2; ++i)
 	{
-		LaunchClient();
+		LaunchCppClient();
+		LaunchSharpClient();
 	}
 	
 	while (true)
