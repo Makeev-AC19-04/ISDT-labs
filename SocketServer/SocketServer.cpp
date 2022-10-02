@@ -126,7 +126,7 @@ void Server()
 			break;
 		CSocket s;
 		Server.Accept(s);
-
+		//
 		thread t(ProcessClient, s.Detach());
 		t.detach();
 		thread c(checkClients);
