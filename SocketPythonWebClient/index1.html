@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web client</title>
+</head>
+<body>
+    <h3>Web socket client</h3>
+    <form action="/cgi-bin/handler.py">
+        Enter your message: <input type="text" name="msg_txt"><br />
+        Enter client's id: <input type="text" name="client_id"><br />
+        <button type="submit" value="send_msg" name="action">Message</button>
+        <button type="submit" value="send_id" name="action">Id</button>
+    </form>
+    <table>
+    <thead>
+        <tr>
+            <th>Emoji</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>🐞</td>
+            <td>Lady Beetle</td>
+        </tr>
+        <tr>
+            <td>🐍</td>
+            <td>Snake</td>
+        </tr>
+        <tr>
+            <td>👍</td>
+            <td>Thumbs Up Sign</td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
