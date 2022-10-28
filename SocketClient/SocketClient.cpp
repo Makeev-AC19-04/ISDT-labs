@@ -19,6 +19,7 @@ void ProcessMessages()
 		{
 		case MT_DATA:
 			cout << "New message: " << m.data << endl << "From: " << to_string(m.header.from) << endl;
+		//case MT_HISTORY
 		default:
 			Sleep(100);
 			break;
@@ -35,6 +36,7 @@ void Client()
 	t.detach();
 
 	Message m = Message::send(MR_BROKER, MT_INIT);
+	Message::send(MR_SUPSERVER, MT_LAST_MESSAGES);
 	while (true){
 		cout << "Menu:\n1.Send to all\n2.Send to one\n3. Exit\n";
 		int menu;

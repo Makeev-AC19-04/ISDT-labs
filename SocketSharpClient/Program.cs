@@ -34,7 +34,7 @@ namespace SocketSharpClient
             t.Start();
             Console.WriteLine("Sharp client has started");
             var m = Message.send(MessageRecipients.MR_BROKER, MessageTypes.MT_INIT);
-
+            Message.send(MessageRecipients.MR_SUPSERVER, MessageTypes.MT_LAST_MESSAGES);
             while (true)
             {
                 Console.WriteLine("Menu:\n1.Send to all\n2.Send to one\n3. Exit");

@@ -8,14 +8,18 @@ enum MessageTypes
 	MT_DATA,
 	MT_NODATA,
 	MT_CONFIRM,
-	MT_LONGWAITING
+	MT_LONGWAITING,
+	MT_INIT_SUPSERVER,
+	MT_LAST_MESSAGES,
+	MT_HISTORY
 };
 
 enum MessageRecipients
 {
 	MR_BROKER = 10,
 	MR_ALL = 50,
-	MR_USER = 100
+	MR_USER = 100,
+	MR_SUPSERVER = 300
 };
 
 struct MessageHeader

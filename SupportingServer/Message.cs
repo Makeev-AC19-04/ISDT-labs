@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Net;
 using System.Net.Sockets;
 
-namespace SocketSharpClient
+namespace SupportingServer
 {
 	public enum MessageTypes : int
 	{
@@ -17,9 +17,11 @@ namespace SocketSharpClient
 		MT_DATA,
 		MT_NODATA,
 		MT_CONFIRM,
-		MT_LAST_MESSAGES = 8
-    }
-    public enum MessageRecipients : int
+		MT_INIT_SUPSERVER = 7, 
+		MT_LAST_MESSAGES,
+		MT_HISTORY
+	}
+	public enum MessageRecipients : int
 	{
 		MR_BROKER = 10,
 		MR_ALL = 50,
@@ -142,13 +144,42 @@ namespace SocketSharpClient
 			else
 			{
 				m.send(s);
-				if (m.receive(s) == MessageTypes.MT_INIT)
+				if (m.receive(s) == MessageTypes.MT_INIT_SUPSERVER)
 				{
 					clientID = m.header.to;
-					Console.WriteLine("clientID is " + clientID + "\n");
+					Console.WriteLine("Supporting server has started. clientID is " + clientID + "\n");
 				}
 				return m;
 			}
 		}
+
+		public static Message sendPrevMessage(MessageRecipients to, MessageRecipients from, MessageTypes type = MessageTypes.MT_DATA, string data = "")
+		{
+			int nPort = 12435;
+			IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), nPort);
+			Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			s.Connect(endPoint);
+			if (!s.Connected)
+			{
+				throw new Exception("Connection error");
+			}
+			var m = new Message(to, from, type, data);
+			if (m.header.to == m.header.from)
+			{
+				Console.WriteLine("You can't write message to yourself");
+				return m;
+			}
+			else
+			{
+				m.send(s);
+				if (m.receive(s) == MessageTypes.MT_INIT_SUPSERVER)
+				{
+					clientID = m.header.to;
+					Console.WriteLine("Supporting server has started. clientID is " + clientID + "\n");
+				}
+				return m;
+			}
+		}
+
 	}
 }

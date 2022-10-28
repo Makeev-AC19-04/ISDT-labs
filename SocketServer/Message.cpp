@@ -23,7 +23,12 @@ void Message::send(CSocket& s, int to, int from, int type, const string& data)
 {
 	Message m(to, from, type, data);
 	m.send(s);
+	//Message ms(MR_SUPSERVER, from, MT_DATA, to_string(to) + ";" + to_string(from) + ";" + data);
+	//cout << to_string(to) + ";" + to_string(from) + ";" + data << endl;
+	//ms.send(s);
 }
+
+//Message Message::send()
 
 Message Message::send(int to, int type, const string& data)
 {
@@ -35,11 +40,19 @@ Message Message::send(int to, int type, const string& data)
 	}
 	Message m(to, clientID, type, data);
 	m.send(s);
+	//Message ms(MR_SUPSERVER, clientID, type, to_string(to) + ";" + to_string(clientID) + ";" + data);
+	//cout << to_string(to) + ";" + to_string(clientID) + ";" + data << endl;
+	//ms.send(s);
 	if (m.receive(s) == MT_INIT)
 	{
 		clientID = m.header.to;
 		cout << "clientID is " + to_string(clientID) + "\n";
 	}
+	//else if (m.receive(s) == MT_INIT_SUPSERVER)
+	//{
+	//	clientID = m.header.to;
+	//	cout << "SupServer clientID is " + to_string(clientID) + "\n";
+	//}
 	return m;
 }
 

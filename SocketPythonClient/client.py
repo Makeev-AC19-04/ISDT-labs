@@ -16,6 +16,7 @@ def ProcessMessages():
 def Client():
         print("Python client has started\n")
         Message.SendMessage(MR_BROKER, MT_INIT)
+        Message.SendMessage(MR_SUPSERVER, MT_LAST_MESSAGES)
         t = threading.Thread(target=ProcessMessages)
         t.start()
         while True:

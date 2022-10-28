@@ -29,7 +29,18 @@ void LaunchSharpClient()
 	CloseHandle(pi.hProcess);
 }
 
+void LaunchSupServer()
+{
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	CreateProcess(NULL, (LPSTR)"net6.0/SupportingServer.exe", NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+}
+
 int maxID = MR_USER;
+int supServerId = MR_SUPSERVER;
+//Session supServerSession;
 map<int, shared_ptr<Session>> sessions;
 
 void checkClients() {
@@ -51,12 +62,10 @@ void checkClients() {
 
 void ProcessClient(SOCKET hSock)
 {
-	//checkClients();
 	CSocket s;
 	s.Attach(hSock);
 	Message m;
 	int code = m.receive(s);
-	//thread check(checkClients, s.Detach());
 	cout << m.header.to << ": " << m.header.from << ": " << m.header.type << ": " << code << endl;
 	switch (code)
 	{
@@ -86,6 +95,45 @@ void ProcessClient(SOCKET hSock)
 		}
 		break;
 	}
+	case MT_INIT_SUPSERVER:
+	{
+		auto session = make_shared<Session>(supServerId, m.data, std::chrono::high_resolution_clock::now());
+		//supServerSession = Session(supServerId, m.data, std::chrono::high_resolution_clock::now());
+		sessions[session->id] = session;
+		supServerId = session->id;
+		Message::send(s, session->id, MR_BROKER, MT_INIT_SUPSERVER);
+		cout << "Supserver entered" << endl;
+		break;
+	}
+	case MT_HISTORY:
+	{
+		cout << "MESSAGE SENT\n";
+		Sleep(100);
+		m.header.type = MT_DATA;
+		auto iSessionFrom = sessions.find(m.header.from);
+		if (iSessionFrom != sessions.end())
+		{
+			iSessionFrom->second->lastInteraction = std::chrono::high_resolution_clock::now();
+			auto iSessionTo = sessions.find(m.header.to);
+			if (iSessionTo != sessions.end() && iSessionTo != sessions.find(supServerId))
+			{
+				iSessionTo->second->add(m);
+				iSessionTo->second->lastInteraction = std::chrono::high_resolution_clock::now();
+			}
+			else if (m.header.to == MR_ALL)
+			{
+				for (auto& [id, session] : sessions)
+				{
+					if (id != m.header.from && id != supServerId) {
+						session->lastInteraction = std::chrono::high_resolution_clock::now();
+						session->add(m);
+					}
+				}
+			}
+			//sessions[supServerId]->add(m);
+		}
+		break;
+	}
 	default:
 	{
 		
@@ -96,7 +144,7 @@ void ProcessClient(SOCKET hSock)
 		{
 			iSessionFrom->second->lastInteraction = std::chrono::high_resolution_clock::now();
 			auto iSessionTo = sessions.find(m.header.to);
-			if (iSessionTo != sessions.end())
+			if (iSessionTo != sessions.end() && iSessionTo != sessions.find(supServerId))
 			{
 				iSessionTo->second->add(m);
 				iSessionTo->second->lastInteraction = std::chrono::high_resolution_clock::now();
@@ -105,12 +153,13 @@ void ProcessClient(SOCKET hSock)
 			{
 				for (auto& [id, session] : sessions)
 				{
-					if (id != m.header.from){
+					if (id != m.header.from && id != supServerId){
 						session->lastInteraction = std::chrono::high_resolution_clock::now();
 						session->add(m);
 						}
 				}
 			}
+			sessions[supServerId]->add(m);
 		}
 		break;
 	}
@@ -123,12 +172,9 @@ void Server()
 
 	CSocket Server;
 	Server.Create(12435);
-
-	for (int i = 0; i < 2; ++i)
-	{
 		LaunchCppClient();
 		LaunchSharpClient();
-	}
+		LaunchSupServer();
 	
 	while (true)
 	{
@@ -136,12 +182,10 @@ void Server()
 			break;
 		CSocket s;
 		Server.Accept(s);
-		//
 		thread t(ProcessClient, s.Detach());
 		t.detach();
 		thread c(checkClients);
 		c.detach();
-		//checkClients();
 	}
 }
 
