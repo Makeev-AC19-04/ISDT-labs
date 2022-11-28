@@ -11,7 +11,8 @@ enum MessageTypes
 	MT_LONGWAITING,
 	MT_INIT_SUPSERVER,
 	MT_LAST_MESSAGES,
-	MT_HISTORY
+	MT_HISTORY,
+	MT_REST_SERVER
 };
 
 enum MessageRecipients
@@ -19,7 +20,8 @@ enum MessageRecipients
 	MR_BROKER = 10,
 	MR_ALL = 50,
 	MR_USER = 100,
-	MR_SUPSERVER = 300
+	MR_SUPSERVER = 300,
+	MR_RESTSERVER = 400
 };
 
 struct MessageHeader

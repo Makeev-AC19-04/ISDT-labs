@@ -6,10 +6,12 @@
 #include "SocketServer.h"
 #include "Message.h"
 #include "Session.h"
+//#include "crow.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
 
 void LaunchCppClient()
 {
@@ -38,10 +40,33 @@ void LaunchSupServer()
 	CloseHandle(pi.hProcess);
 }
 
+
 int maxID = MR_USER;
 int supServerId = MR_SUPSERVER;
-//Session supServerSession;
+int restServerId = MR_RESTSERVER;
 map<int, shared_ptr<Session>> sessions;
+
+//auto ProcessMessage(crow::json::rvalue mjson) {
+//
+//	Message m;
+//	m.header.to = mjson["to"].i();
+//	switch (m.header.type = mjson["type"].i())
+//	{
+//	
+//}
+
+//void StartHttp() {
+//	crow::SimpleApp app;
+//	CROW_ROUTE(app, "/")([]() {
+//		return "Hello world";
+//		});
+//	//CROW_ROUTE(app, "/<int>/<int>/<int>/<string>").methods("POST"_method)([](int from, int to, int type, string data) {
+//	CROW_ROUTE(app, "/send").methods("POST"_method)([](const crow::request& req) {
+//		auto loadJson = crow::json::load(req.body);
+//		return ProcessMessage(loadJson);
+//		});
+//	app.port(55555).multithreaded().run();
+//}
 
 void checkClients() {
 	int del = 0;
@@ -89,8 +114,8 @@ void ProcessClient(SOCKET hSock)
 
 		if (iSession != sessions.end())
 		{
-				iSession->second->lastInteraction = std::chrono::high_resolution_clock::now();
-				iSession->second->send(s);
+			iSession->second->lastInteraction = std::chrono::high_resolution_clock::now();
+			iSession->second->send(s);
 
 		}
 		break;
@@ -98,11 +123,19 @@ void ProcessClient(SOCKET hSock)
 	case MT_INIT_SUPSERVER:
 	{
 		auto session = make_shared<Session>(supServerId, m.data, std::chrono::high_resolution_clock::now());
-		//supServerSession = Session(supServerId, m.data, std::chrono::high_resolution_clock::now());
 		sessions[session->id] = session;
 		supServerId = session->id;
 		Message::send(s, session->id, MR_BROKER, MT_INIT_SUPSERVER);
 		cout << "Supserver entered" << endl;
+		break;
+	} 
+	case MT_REST_SERVER:
+	{
+		auto session = make_shared<Session>(restServerId, m.data, std::chrono::high_resolution_clock::now());
+		sessions[session->id] = session;
+		restServerId = session->id;
+		Message::send(s, session->id, MR_BROKER, MT_REST_SERVER);
+		cout << "REST server entered" << endl;
 		break;
 	}
 	case MT_HISTORY:
@@ -130,13 +163,12 @@ void ProcessClient(SOCKET hSock)
 					}
 				}
 			}
-			//sessions[supServerId]->add(m);
 		}
 		break;
 	}
 	default:
 	{
-		
+
 		cout << "MESSAGE SENT\n";
 		Sleep(100);
 		auto iSessionFrom = sessions.find(m.header.from);
@@ -153,13 +185,25 @@ void ProcessClient(SOCKET hSock)
 			{
 				for (auto& [id, session] : sessions)
 				{
-					if (id != m.header.from && id != supServerId){
+					if (id != m.header.from && id != supServerId) {
 						session->lastInteraction = std::chrono::high_resolution_clock::now();
 						session->add(m);
-						}
+					}
 				}
 			}
 			sessions[supServerId]->add(m);
+			if (sessions.count(restServerId)) {
+				sessions[restServerId]->add(m);
+			}
+			//sessions[restServerId]->add(m);
+			//try
+			//{
+			//	sessions[restServerId]->add(m);
+			//}
+			//catch()
+			//{
+			//	cout << "REST server didn't entered";
+			//}
 		}
 		break;
 	}
@@ -175,6 +219,9 @@ void Server()
 		LaunchCppClient();
 		LaunchSharpClient();
 		LaunchSupServer();
+
+	//thread thttp(StartHttp);
+	//thttp.detach();
 	
 	while (true)
 	{

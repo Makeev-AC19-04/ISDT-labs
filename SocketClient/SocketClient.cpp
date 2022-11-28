@@ -19,7 +19,7 @@ void ProcessMessages()
 		{
 		case MT_DATA:
 			cout << "New message: " << m.data << endl << "From: " << to_string(m.header.from) << endl;
-		//case MT_HISTORY
+			//case MT_HISTORY
 		default:
 			Sleep(100);
 			break;
@@ -37,42 +37,42 @@ void Client()
 
 	Message m = Message::send(MR_BROKER, MT_INIT);
 	Message::send(MR_SUPSERVER, MT_LAST_MESSAGES);
-	while (true){
+	while (true) {
 		cout << "Menu:\n1.Send to all\n2.Send to one\n3. Exit\n";
 		int menu;
 		cin >> menu;
 		switch (menu)
 		{
 		case 1: {
-				cout << "Enter your message\n";
-				string str;
-				cin >> str;
-				Message::send(MR_ALL, MT_DATA, str);
-				cout << "Message has sent\n";
-				break;
+			cout << "Enter your message\n";
+			string str;
+			cin >> str;
+			Message::send(MR_ALL, MT_DATA, str);
+			cout << "Message has sent\n";
+			break;
 		}
 		case 2: {
-				cout << "Enter your message\n";
-				string str;
-				cin >> str;
-				cout << "Enter client's id\n";
-				int toId;
-				cin >> toId;
-				Message m;
-				if (toId == m.clientID) {
-					cout << "You can't send message to yourself\n";
-					break;
-				}
-				else {
-					Message::send(toId, MT_DATA, str);
-					cout << "Message has sent\n";
-					break;
-				}
+			cout << "Enter your message\n";
+			string str;
+			cin >> str;
+			cout << "Enter client's id\n";
+			int toId;
+			cin >> toId;
+			Message m;
+			if (toId == m.clientID) {
+				cout << "You can't send message to yourself\n";
+				break;
+			}
+			else {
+				Message::send(toId, MT_DATA, str);
+				cout << "Message has sent\n";
+				break;
+			}
 		}
 		case 3: {
-				Message m = Message::send(MR_BROKER, MT_EXIT);
-				exit(0);
-				break;
+			Message m = Message::send(MR_BROKER, MT_EXIT);
+			exit(0);
+			break;
 		}
 		}
 	}

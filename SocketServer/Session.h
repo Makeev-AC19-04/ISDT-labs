@@ -1,5 +1,6 @@
 #pragma once
 #include <ctime>
+//#include "crow.h"
 
 
 class Session
@@ -35,5 +36,30 @@ public:
 			messages.pop();
 		}
 	}
+
+	//crow::json::wvalue SendResponse()
+	//{
+	//	CSingleLock lock(&cs, TRUE);
+	//	if (messages.empty())
+	//	{
+	//		//Message::send(s, id, MR_BROKER, MT_NODATA);
+	//		crow::json::wvalue response({
+	//		{"from", MR_BROKER},
+	//		{"type", MT_NODATA}
+	//			});
+	//		return response;
+	//	}
+	//	else
+	//	{
+	//		crow::json::wvalue response({
+	//		{"from", messages.front().clientID},
+	//		{"type", messages.front().header.type},
+	//		{"data", messages.front().data},
+	//			});
+	//		messages.pop();
+	//		return response;
+	//	}
+	//	
+	//}
 };
 

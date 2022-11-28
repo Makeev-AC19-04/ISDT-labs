@@ -76,7 +76,6 @@ namespace SupportingServer
         {
             Thread t = new Thread(ProcessMessages);
             t.Start();
-            //Console.WriteLine("Sharp client has started");
             var m = Message.send(MessageRecipients.MR_BROKER, MessageTypes.MT_INIT_SUPSERVER);
         }
     }

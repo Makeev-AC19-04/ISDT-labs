@@ -48,11 +48,6 @@ Message Message::send(int to, int type, const string& data)
 		clientID = m.header.to;
 		cout << "clientID is " + to_string(clientID) + "\n";
 	}
-	//else if (m.receive(s) == MT_INIT_SUPSERVER)
-	//{
-	//	clientID = m.header.to;
-	//	cout << "SupServer clientID is " + to_string(clientID) + "\n";
-	//}
 	return m;
 }
 

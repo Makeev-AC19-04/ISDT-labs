@@ -9,6 +9,7 @@ MT_DATA		= 3
 MT_NODATA	= 4
 MT_CONFIRM	= 5
 MT_LAST_MESSAGES= 8
+MT_REST_SERVER = 10
 
 MR_BROKER	= 10
 MR_ALL		= 50
@@ -51,6 +52,19 @@ class Message:
 		if self.Header.Size > 0:
 			self.Data = struct.unpack(f'{self.Header.Size}s', s.recv(self.Header.Size))[0].decode('cp866')
 
+	def SendAsClient(To, From, Type = MT_DATA, Data=""):
+		HOST = 'localhost'
+		PORT = 12435
+		with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+			s.connect((HOST, PORT))
+			m = Message(To, From, Type, Data)
+			if m.Header.From == m.Header.To:
+				print("You can't send message to yoursef")
+			else:
+				m.Send(s)
+				m.Receive(s)
+				return m
+
 	def SendMessage(To, Type = MT_DATA, Data=""):
 		HOST = 'localhost'
 		PORT = 12435
@@ -62,8 +76,7 @@ class Message:
 			else:
 				m.Send(s)
 				m.Receive(s)
-				if m.Header.Type == MT_INIT:
+				if m.Header.Type == MT_REST_SERVER:
 					Message.ClientID = m.Header.To
-					print("clientID is " + str(m.Header.To))
+					print("REST server's id is  " + str(m.Header.To))
 				return m
-

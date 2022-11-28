@@ -53,14 +53,6 @@ class requestHandler(BaseHTTPRequestHandler):
                 Message.SendMessage(id, MT_DATA, text)
             else:
                 Message.SendMessage(MR_ALL, MT_DATA, text)
-            #if action == "Send to one":
-             #   Message.SendMessage(id, MT_DATA, text)
-               # clientmsg = 'Message has sent'
-            #elif action == "Send to all":
-             #   Message.SendMessage(MR_ALL, MT_DATA, text)
-              #  clientmsg = 'Message has sent'
-            #elif action == "Update":
-             #   pass
 
         self.send_response(301)
         self.send_header('content-type', 'text/html')
@@ -93,21 +85,21 @@ def Client():
         t = threading.Thread(target=ProcessMessages)
         t.start()
         while True:
-                print("Menu:\n1.Send to all\n2.Send to one\n3. Exit")
-                menu = int(input())
-                if menu == 1:
-                    print("Enter your message")
-                    message = input()
-                    Message.SendMessage(MR_ALL, MT_DATA, message)
-                elif menu == 2:
-                    print("Enter client's id")
-                    id = int(input())
-                    print("Enter your message")
-                    message = input()
-                    Message.SendMessage(id, MT_DATA, message)
-                elif menu == 3:
-                    Message.SendMessage(MR_BROKER, MT_EXIT)
-                    quit()
-                    break
+            print("Menu:\n1.Send to all\n2.Send to one\n3. Exit")
+            menu = int(input())
+            if menu == 1:
+                print("Enter your message")
+                message = input()
+                Message.SendMessage(MR_ALL, MT_DATA, message)
+            elif menu == 2:
+                print("Enter client's id")
+                id = int(input())
+                print("Enter your message")
+                message = input()
+                Message.SendMessage(id, MT_DATA, message)
+            elif menu == 3:
+                Message.SendMessage(MR_BROKER, MT_EXIT)
+                quit()
+                break
 
 Client()
